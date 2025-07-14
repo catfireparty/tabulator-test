@@ -3,7 +3,17 @@ import { Component, inject, ViewChild } from '@angular/core';
 import { faker } from '@faker-js/faker';
 import { ButtonModule } from 'primeng/button';
 import { Popover, PopoverModule } from 'primeng/popover';
-import { DataTreeModule, EditModule, FormatModule, InteractionModule, SortModule, Tabulator } from 'tabulator-tables';
+import {
+  ColumnDefinition,
+  DataTreeModule,
+  EditModule,
+  FormatModule,
+  FrozenColumnsModule,
+  FrozenRowsModule,
+  InteractionModule,
+  SortModule,
+  Tabulator,
+} from 'tabulator-tables';
 
 Tabulator.registerModule([FormatModule, EditModule]);
 
@@ -27,7 +37,15 @@ export class App {
   @ViewChild('menu') menu!: Popover;
 
   constructor() {
-    Tabulator.registerModule([FormatModule, EditModule, SortModule, DataTreeModule, InteractionModule]);
+    Tabulator.registerModule([
+      FormatModule,
+      EditModule,
+      SortModule,
+      DataTreeModule,
+      InteractionModule,
+      FrozenColumnsModule,
+      FrozenRowsModule,
+    ]);
   }
 
   wibble(inst_id: string, row: string) {
@@ -40,58 +58,118 @@ export class App {
   ngOnInit() {
     const percentPipe = this.percentPipe;
 
+    const columns: ColumnDefinition[] = [];
+
+    columns.push(
+      { title: 'Name', field: 'name', width: 160, frozen: true },
+      {
+        title: '',
+        formatter: (cell) => {
+          if (cell.getValue()) {
+            return `<i id="row_${cell.getRow().getPosition()}">TODO</i>`;
+          } else {
+            return '';
+          }
+        },
+        field: 'inst_id',
+        frozen: true,
+        width: 40,
+        hozAlign: 'center',
+        cellClick: (e, cell) => {
+          if (cell.getValue()) {
+            this.wibble(cell.getValue(), `row_${cell.getRow().getPosition()}`);
+          }
+        },
+      },
+      {
+        //create column group
+        title: 'Weight',
+        columns: [
+          {
+            title: 'Port.',
+            field: 'weight_port',
+            hozAlign: 'right',
+            formatter: function (cell) {
+              return percentPipe.transform(cell.getValue()) || '';
+            },
+            sorter: 'number',
+            width: 100,
+          },
+          {
+            title: 'Comp.',
+            field: 'weight_comp',
+            hozAlign: 'right',
+            formatter: function (cell) {
+              return percentPipe.transform(cell.getValue()) || '';
+            },
+            sorter: 'number',
+            width: 100,
+          },
+        ],
+      },
+      {
+        //create column group
+        title: 'Weight',
+        columns: [
+          {
+            title: 'Port.',
+            field: 'weight_port',
+            hozAlign: 'right',
+            formatter: function (cell) {
+              return percentPipe.transform(cell.getValue()) || '';
+            },
+            sorter: 'number',
+            width: 100,
+          },
+          {
+            title: 'Comp.',
+            field: 'weight_comp',
+            hozAlign: 'right',
+            formatter: function (cell) {
+              return percentPipe.transform(cell.getValue()) || '';
+            },
+            sorter: 'number',
+            width: 100,
+          },
+        ],
+      }
+    );
+
+    for (let i = 0; i < 20; i++) {
+      columns.push({
+        //create column group
+        title: 'Weight',
+        columns: [
+          {
+            title: 'Port.',
+            field: 'weight_port',
+            hozAlign: 'right',
+            formatter: function (cell) {
+              return percentPipe.transform(cell.getValue()) || '';
+            },
+            sorter: 'number',
+            width: 100,
+          },
+          {
+            title: 'Comp.',
+            field: 'weight_comp',
+            hozAlign: 'right',
+            formatter: function (cell) {
+              return percentPipe.transform(cell.getValue()) || '';
+            },
+            sorter: 'number',
+            width: 100,
+          },
+        ],
+      });
+    }
+
     const table = new Tabulator('#example-table', {
       height: '500px',
       data: generateRows(),
       dataTree: true,
       dataTreeStartExpanded: [true, false],
-      columns: [
-        { title: 'Name', field: 'name', width: 160 },
-        {
-          title: '',
-          formatter: (cell) => {
-            if (cell.getValue()) {
-              return `<i id="row_${cell.getRow().getPosition()}">TODO</i>`;
-            } else {
-              return '';
-            }
-          },
-          field: 'inst_id',
-          width: 40,
-          hozAlign: 'center',
-          cellClick: (e, cell) => {
-            if (cell.getValue()) {
-              this.wibble(cell.getValue(), `row_${cell.getRow().getPosition()}`);
-            }
-          },
-        },
-        {
-          //create column group
-          title: 'Weight',
-          columns: [
-            {
-              title: 'Port.',
-              field: 'weight_port',
-              hozAlign: 'right',
-              formatter: function (cell) {
-                return percentPipe.transform(cell.getValue()) || '';
-              },
-              sorter: 'number',
-              width: 100,
-            },
-            {
-              title: 'Comp.',
-              field: 'weight_comp',
-              hozAlign: 'right',
-              formatter: function (cell) {
-                return percentPipe.transform(cell.getValue()) || '';
-              },
-              sorter: 'number',
-              width: 100,
-            },
-          ],
-        },
-      ],
+      columns,
     });
   }
 }
