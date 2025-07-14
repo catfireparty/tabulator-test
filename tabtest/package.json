@@ -26,7 +26,13 @@
     "@angular/forms": "^20.1.0",
     "@angular/platform-browser": "^20.1.0",
     "@angular/router": "^20.1.0",
+    "@faker-js/faker": "9.9.0",
+    "@primeuix/themes": "1.2.1",
+    "@types/luxon": "3.6.2",
+    "luxon": "3.7.1",
+    "primeng": "20.0.0-rc.1",
     "rxjs": "~7.8.0",
+    "tabulator-tables": "6.3.1",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
   },
